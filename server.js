@@ -31,7 +31,9 @@ app.get('/scrapeall', async (req, res)=>{
 });
 
 app.get('/peek-results', (req,res)=>{
-  console.log("Timing:", startTime, endTime, (startTime.getTime()-endTime.getTime())/60000, 'mins');
+  if (startTime && endTime)
+    console.log("Timing:", startTime, endTime, (startTime.getTime()-endTime.getTime())/60000, 'mins');
+  
   res.json(phoneData);
 });
 
@@ -71,7 +73,7 @@ function scrapePage(p){
           });
 
           if (phones && phones.length > 0){
-            colleges[schoolUrl] = phones[0].substr(4);
+            colleges[schoolUrl] = cleanPhone(phones[0].substr(4));
             console.log('#########',schoolName, phones[0]);
           }
           else {
@@ -83,7 +85,7 @@ function scrapePage(p){
               let phoneCandidate = content.replace(/[()\-+ A-z]/g, '');
               if (phoneCandidate.length < 9) return;
               if (phoneCandidate.length > 9 && phoneCandidate.length < 12) {
-                colleges[schoolUrl] = phones[0].substr(4);
+                colleges[schoolUrl] = cleanPhone(phones[0].substr(4));
                 console.log('#########',schoolName, phones[0]);
               }
             })
@@ -104,6 +106,12 @@ function scrapePage(p){
       reject(err);
     })
   });
+}
+
+function cleanPhone(ph){
+  let clean = ph.replace('%20', '').replace(/[^0-9]/g, '');
+  if (clean.indexOf('1') === 0 && clean.length > 10) return clean.substr(1);
+  return clean;
 }
 
 app.listen(app.get('port'), ()=>console.log('Server listening on port '+ app.get('port')));
