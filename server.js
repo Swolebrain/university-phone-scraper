@@ -25,9 +25,9 @@ app.get('/scrapeall', async (req, res)=>{
   for (let i = 0; i < 77; i++){
     let fonez = await scrapePage(i);
     phoneData = Object.assign(phoneData, fonez);
-    endTime = new Date();
   }
-
+  endTime = new Date();
+  fs.writeFile(new Date().getTime(), JSON.stringify(phoneData, null, 2));
 });
 
 app.get('/peek-results', (req,res)=>{
